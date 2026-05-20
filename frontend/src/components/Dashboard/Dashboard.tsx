@@ -1134,8 +1134,10 @@ function EmailLogsModal({ onClose }: { onClose: () => void }) {
       try {
         const { data: sessionData } = await supabase.auth.getSession();
         const accessToken = sessionData?.session?.access_token;
-        const headers: Record<string, string> = {};
-        if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+        const headers: HeadersInit = new Headers();
+        if (accessToken) {
+          (headers as Headers).set('Authorization', `Bearer ${accessToken}`);
+        }
         const res = await fetch('/api/email-reminder-logs?limit=200', { headers });
         const result = await res.json();
         if (!res.ok) throw new Error(result?.error || 'Failed to load logs');
@@ -1154,7 +1156,10 @@ function EmailLogsModal({ onClose }: { onClose: () => void }) {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token;
-      const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+      const headers: HeadersInit = new Headers();
+      if (accessToken) {
+        (headers as Headers).set('Authorization', `Bearer ${accessToken}`);
+      }
       const res = await fetch('/api/email-reminder-logs?limit=200', { headers });
       const result = await res.json();
       if (!res.ok) throw new Error(result?.error || 'Failed to load logs');
@@ -1173,10 +1178,11 @@ function EmailLogsModal({ onClose }: { onClose: () => void }) {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token;
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      };
+      const headers: HeadersInit = new Headers();
+      (headers as Headers).set('Content-Type', 'application/json');
+      if (accessToken) {
+        (headers as Headers).set('Authorization', `Bearer ${accessToken}`);
+      }
       const res = await fetch('/api/email-reminder-logs', {
         method: 'DELETE',
         headers,
