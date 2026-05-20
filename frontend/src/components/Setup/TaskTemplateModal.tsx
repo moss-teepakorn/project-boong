@@ -101,7 +101,7 @@ export default function TaskTemplateModal({ onClose }: Props) {
       ]);
       const found = templateRes.data.find((t) => t.id === templateId);
       setTemplateNameDraft(found?.name || '');
-      setItemsDraft(itemRes.data);
+      setItemsDraft(itemRes.data.slice().sort((a, b) => compareWbs(a.wbs || '', b.wbs || '')));
       setTemplates(templateRes.data);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to load template items');
