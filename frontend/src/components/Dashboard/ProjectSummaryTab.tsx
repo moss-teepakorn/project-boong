@@ -32,7 +32,7 @@ export default function ProjectSummaryTab({ project }: Props) {
   const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024);
   const [chartWidth, setChartWidth] = useState<number>(typeof window !== 'undefined' ? Math.max(window.innerWidth - 56, 760) : 760);
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const ROW_H = 36;
+  const ROW_H = 32;
   const chartWrapperRef = useRef<HTMLDivElement | null>(null);
   const isMobile = windowWidth < 768;
 
@@ -518,9 +518,9 @@ export default function ProjectSummaryTab({ project }: Props) {
                     onClick={() => handleSave(row.snapshotDate)}
                     disabled={!row.dirty || savingSnapshot === row.snapshotDate}
                     style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 10,
+                      width: 20,
+                      height: 20,
+                      borderRadius: 8,
                       border: `1px solid ${row.dirty ? C.primary : C.border}`,
                       background: row.dirty ? C.primary : C.white,
                       color: row.dirty ? '#fff' : C.text,
@@ -531,7 +531,7 @@ export default function ProjectSummaryTab({ project }: Props) {
                       flexShrink: 0,
                     }}
                   >
-                    {savingSnapshot === row.snapshotDate ? <span style={{ fontSize: 12 }}>…</span> : <Check size={16} />}
+                    {savingSnapshot === row.snapshotDate ? <span style={{ fontSize: 10 }}>…</span> : <Check size={12} />}
                   </button>
                   {row.id && (
                     <button
@@ -539,9 +539,9 @@ export default function ProjectSummaryTab({ project }: Props) {
                       onClick={() => handleDelete(row.id, row.snapshotDate)}
                       disabled={savingSnapshot === row.snapshotDate}
                       style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 10,
+                        width: 20,
+                        height: 20,
+                        borderRadius: 8,
                         border: `1px solid ${C.red}`,
                         background: C.redBg,
                         color: C.red,
@@ -552,7 +552,7 @@ export default function ProjectSummaryTab({ project }: Props) {
                         flexShrink: 0,
                       }}
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={12} />
                     </button>
                   )}
                 </div>
@@ -574,9 +574,9 @@ export default function ProjectSummaryTab({ project }: Props) {
               <tbody>
                 {rows.map((row) => (
                   <tr key={row.snapshotDate} style={{ background: row.dirty ? '#FEFBF7' : undefined, height: ROW_H, minHeight: ROW_H }}>
-                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle' }}>{fmtDate(row.snapshotDate)}</td>
-                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle' }}>{row.baselinePercent}%</td>
-                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle' }}>
+                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle', padding: '8px 10px' }}>{fmtDate(row.snapshotDate)}</td>
+                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle', padding: '8px 10px' }}>{row.baselinePercent}%</td>
+                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle', padding: '8px 10px' }}>
                       <input
                         type="number"
                         min={0}
@@ -584,27 +584,27 @@ export default function ProjectSummaryTab({ project }: Props) {
                         value={row.actualInput}
                         onChange={(e) => handleActualChange(row.snapshotDate, e.target.value)}
                         placeholder=""
-                        style={{ width: 72, height: 30, padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: 'Poppins, sans-serif' }}
+                        style={{ width: 72, height: 28, padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: 'Poppins, sans-serif' }}
                       />
                     </td>
-                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle' }}>
+                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle', padding: '8px 10px' }}>
                       <textarea
                         rows={1}
                         value={row.note}
                         onChange={(e) => handleNoteChange(row.snapshotDate, e.target.value)}
-                        style={{ width: '100%', minWidth: 220, height: 30, padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: 'Poppins, sans-serif', resize: 'none', lineHeight: 1.3, overflow: 'hidden' }}
+                        style={{ width: '100%', minWidth: 220, height: 28, padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13, fontFamily: 'Poppins, sans-serif', resize: 'none', lineHeight: 1.3, overflow: 'hidden' }}
                       />
                     </td>
-                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle' }}>
+                    <td style={{ ...TD, height: ROW_H, verticalAlign: 'middle', padding: '8px 10px' }}>
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                         <button
                           type="button"
                           onClick={() => handleSave(row.snapshotDate)}
                           disabled={!row.dirty || savingSnapshot === row.snapshotDate}
                           style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 10,
+                            width: 20,
+                            height: 20,
+                            borderRadius: 8,
                             border: `1px solid ${row.dirty ? C.primary : C.border}`,
                             background: row.dirty ? C.primary : C.white,
                             color: row.dirty ? '#fff' : C.text,
@@ -615,7 +615,7 @@ export default function ProjectSummaryTab({ project }: Props) {
                             flexShrink: 0,
                           }}
                         >
-                          {savingSnapshot === row.snapshotDate ? <span style={{ fontSize: 12 }}>…</span> : <Check size={16} />}
+                          {savingSnapshot === row.snapshotDate ? <span style={{ fontSize: 10 }}>…</span> : <Check size={12} />}
                         </button>
                         {row.id && (
                           <button
@@ -623,9 +623,9 @@ export default function ProjectSummaryTab({ project }: Props) {
                             onClick={() => handleDelete(row.id, row.snapshotDate)}
                             disabled={savingSnapshot === row.snapshotDate}
                             style={{
-                              width: 32,
-                              height: 32,
-                              borderRadius: 10,
+                              width: 20,
+                              height: 20,
+                              borderRadius: 8,
                               border: `1px solid ${C.red}`,
                               background: C.redBg,
                               color: C.red,
@@ -636,7 +636,7 @@ export default function ProjectSummaryTab({ project }: Props) {
                               flexShrink: 0,
                             }}
                           >
-                            <Trash2 size={16} />
+                            <Trash2 size={12} />
                           </button>
                         )}
                       </div>

@@ -403,7 +403,7 @@ export default function Dashboard() {
 function WelcomeSummary({ projects, tasks, onOpen, onEdit, onDelete, isMobile }: { projects: Project[]; tasks: any[]; onOpen: (p: Project) => void; onEdit: (p: Project) => void; onDelete: (p: Project) => void; isMobile: boolean }) {
   const { masterCodes } = useStore();
   const [showHC, setShowHC] = useState(false);
-  const [projectView, setProjectView] = useState<'card' | 'table'>('card');
+  const [projectView, setProjectView] = useState<'card' | 'table'>('table');
   const projectStatusOptions = masterCodes
     .filter((code) => code.codeType === 'project_status' && code.active)
     .sort((a, b) => a.sortOrder - b.sortOrder);
