@@ -4,8 +4,6 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method Not Allowed' });
-
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
     return res.status(500).json({ error: 'Missing Supabase env vars' });
   }
@@ -28,6 +26,22 @@ export default async function handler(req, res) {
   if (profErr || callerProfile?.role !== 'admin') {
     return res.status(403).json({ error: 'Forbidden: admin only' });
   }
+
+  if (req.method === 'DELETE') {
+    const body = req.body || {};
+    const ids = Array.isArray(body.ids) ? body.ids.filter((id) => typeof id === 'string') : [];
+    if (!ids.length) return res.status(400).json({ error: 'No ids provided' });
+
+    const { error } = await supabase
+      .from('email_reminder_logs')
+      .delete()
+      .in('id', ids);
+
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ deleted: ids.length });
+  }
+
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method Not Allowed' });
 
   // Query params
   const limit = Math.min(Number(req.query.limit) || 200, 500);

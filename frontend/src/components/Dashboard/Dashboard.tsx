@@ -1121,9 +1121,11 @@ type EmailLog = {
 
 function EmailLogsModal({ onClose }: { onClose: () => void }) {
   const [logs, setLogs] = React.useState<EmailLog[]>([]);
+  const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [filterProject, setFilterProject] = React.useState('');
+  const [deleting, setDeleting] = React.useState(false);
 
   React.useEffect(() => {
     const loadLogs = async () => {
@@ -1145,6 +1147,50 @@ function EmailLogsModal({ onClose }: { onClose: () => void }) {
     };
     loadLogs();
   }, []);
+
+  const reloadLogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+      const res = await fetch('/api/email-reminder-logs?limit=200', { headers });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result?.error || 'Failed to load logs');
+      setLogs(result.logs || []);
+      setSelectedIds([]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load');
+    }
+    setLoading(false);
+  };
+
+  const handleDeleteSelected = async () => {
+    if (!selectedIds.length) return;
+    if (!window.confirm(`Delete ${selectedIds.length} selected log(s)?`)) return;
+    setDeleting(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      };
+      const res = await fetch('/api/email-reminder-logs', {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify({ ids: selectedIds }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result?.error || 'Failed to delete logs');
+      await reloadLogs();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to delete logs');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const filteredLogs = filterProject
     ? logs.filter((l) =>
@@ -1183,7 +1229,7 @@ function EmailLogsModal({ onClose }: { onClose: () => void }) {
             <span style={{ fontSize: 15, fontWeight: 700, color: C.text, fontFamily: 'Poppins, sans-serif' }}>Email Send Logs</span>
             <span style={{ fontSize: 12, color: C.text2 }}>({filteredLogs.length} records)</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
             <input
               type="text"
               placeholder="Filter by project..."
@@ -1191,6 +1237,24 @@ function EmailLogsModal({ onClose }: { onClose: () => void }) {
               onChange={(e) => setFilterProject(e.target.value)}
               style={{ padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 12, color: C.text, outline: 'none', width: 180 }}
             />
+            <button
+              type="button"
+              disabled={!selectedIds.length || deleting}
+              onClick={handleDeleteSelected}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 8,
+                border: `1px solid ${selectedIds.length ? C.red : C.border}`,
+                background: selectedIds.length ? C.redBg : C.bg2,
+                color: selectedIds.length ? C.red : C.text2,
+                cursor: selectedIds.length ? 'pointer' : 'not-allowed',
+                fontSize: 12,
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {deleting ? 'Deleting…' : `Delete ${selectedIds.length ? `(${selectedIds.length})` : ''}`}
+            </button>
             <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.text2, fontSize: 20, lineHeight: 1, padding: 2 }}>×</button>
           </div>
         </div>
@@ -1210,7 +1274,17 @@ function EmailLogsModal({ onClose }: { onClose: () => void }) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
                 <tr style={{ background: C.bg, position: 'sticky', top: 0, zIndex: 1 }}>
-                  {['Project ID', 'Project Name', 'Type', 'Scheduled', 'Sent At', 'Recipient', 'Tasks', 'Status', 'Error'].map((h) => (
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 700, color: C.text2, borderBottom: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>
+                <input
+                  type="checkbox"
+                  checked={filteredLogs.length > 0 && selectedIds.length === filteredLogs.length}
+                  onChange={(e) => {
+                    if (e.currentTarget.checked) setSelectedIds(filteredLogs.map((log) => log.id));
+                    else setSelectedIds([]);
+                  }}
+                />
+              </th>
+              {['Project ID', 'Project Name', 'Type', 'Scheduled', 'Sent At', 'Recipient', 'Tasks', 'Status', 'Error'].map((h) => (
                     <th key={h} style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 700, color: C.text2, borderBottom: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
@@ -1220,6 +1294,19 @@ function EmailLogsModal({ onClose }: { onClose: () => void }) {
                   <tr key={log.id} style={{ borderBottom: `1px solid ${C.border}` }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = '#F8FAFF'; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'; }}>
+                    <td style={{ padding: '10px 12px' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(log.id)}
+                        onChange={(e) => {
+                          if (e.currentTarget.checked) {
+                            setSelectedIds((prev) => [...prev, log.id]);
+                          } else {
+                            setSelectedIds((prev) => prev.filter((id) => id !== log.id));
+                          }
+                        }}
+                      />
+                    </td>
                     <td style={{ padding: '9px 12px', color: C.primary, fontWeight: 700, fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{log.project_code || '-'}</td>
                     <td style={{ padding: '9px 12px', color: C.text, maxWidth: 200 }}>{log.project_name || '-'}</td>
                     <td style={{ padding: '9px 12px' }}>
