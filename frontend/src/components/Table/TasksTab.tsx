@@ -466,7 +466,10 @@ export default function TasksTab({ projectId, extraActions }: Props) {
   const projectTasks = tasks.filter(t => t.projectId === projectId);
   const phaseOptions = masterCodes
     .filter((code) => code.codeType === 'task_phase' && code.active)
-    .sort((a, b) => String(a.codeValue).localeCompare(String(b.codeValue), undefined, { numeric: true }))
+    .sort((a, b) =>
+      String(a.codeType).localeCompare(String(b.codeType), undefined, { numeric: true })
+      || String(a.codeKey).localeCompare(String(b.codeKey), undefined, { numeric: true })
+    )
     .map((code) => ({ value: code.codeValue, label: code.label }));
   const effectivePhaseOptions: PhaseOption[] = phaseOptions.length > 0
     ? phaseOptions
