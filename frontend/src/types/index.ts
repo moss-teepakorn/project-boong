@@ -76,6 +76,7 @@ export interface Member {
   id: string;
   projectId: string;
   name: string;
+  thaiName: string;
   nickname: string;
   role: string;
   position: string;      // ← new

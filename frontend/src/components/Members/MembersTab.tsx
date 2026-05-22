@@ -249,6 +249,7 @@ export default function MembersTab({ projectId, extraActions }: Props) {
                       <Avatar name={mb.name} size={30} />
                       <div style={{ minWidth: 0 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{mb.name}</div>
+                        {mb.thaiName ? <div style={{ fontSize: 11, color: C.text3, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{mb.thaiName}</div> : null}
                         <div style={{ fontSize: 10, color: C.text2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{mb.email}</div>
                       </div>
                     </div>
@@ -289,7 +290,10 @@ export default function MembersTab({ projectId, extraActions }: Props) {
                   <td style={TD}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <Avatar name={mb.name} size={30} />
-                      <span style={{ fontWeight: 600, color: C.text }}>{mb.name}</span>
+                      <div>
+                        <div style={{ fontWeight: 600, color: C.text }}>{mb.name}</div>
+                        {mb.thaiName ? <div style={{ fontSize: 11, color: C.text3, marginTop: 2 }}>{mb.thaiName}</div> : null}
+                      </div>
                     </div>
                   </td>
                   <td style={{ ...TD, color: C.text2 }}>{mb.nickname}</td>
@@ -350,12 +354,15 @@ export default function MembersTab({ projectId, extraActions }: Props) {
 }
 
 function MemberModal({ data, currentUserRole, onClose, onSave }: { data: Partial<Member>; currentUserRole: UserRole; onClose: () => void; onSave: (f: Partial<Member>) => void }) {
-  const [form, setForm] = useState<Partial<Member>>({ name: '', nickname: '', role: '', position: '', email: '', tel: '', ext: '', type: 'internal', notes: '', ...data });
+  const [form, setForm] = useState<Partial<Member>>({ name: '', thaiName: '', nickname: '', role: '', position: '', email: '', tel: '', ext: '', type: 'internal', notes: '', ...data });
   const up = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
   return (
     <Modal title={form.id ? 'Edit Member' : 'Add Member'} onClose={onClose} width={520}>
       <FormRow label="Full Name" required>
         <Input autoFocus value={form.name ?? ''} onChange={v => up('name', v)} placeholder="e.g. John Smith" />
+      </FormRow>
+      <FormRow label="Thai Name">
+        <Input value={form.thaiName ?? ''} onChange={v => up('thaiName', v)} placeholder="ชื่อไทย" />
       </FormRow>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <FormRow label="Nickname"><Input value={form.nickname ?? ''} onChange={v => up('nickname', v)} placeholder="e.g. John" /></FormRow>

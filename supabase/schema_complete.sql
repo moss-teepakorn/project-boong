@@ -112,6 +112,7 @@ create table if not exists public.members (
   id          uuid primary key default uuid_generate_v4(),
   project_id  uuid not null references public.projects(id) on delete cascade,
   name        text not null default '',
+  thai_name   text not null default '',
   nickname    text not null default '',
   role        text not null default '',
   position    text not null default '',
