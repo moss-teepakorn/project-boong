@@ -358,12 +358,14 @@ function MemberModal({ data, currentUserRole, onClose, onSave }: { data: Partial
   const up = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
   return (
     <Modal title={form.id ? 'Edit Member' : 'Add Member'} onClose={onClose} width={520}>
-      <FormRow label="Full Name" required>
-        <Input autoFocus value={form.name ?? ''} onChange={v => up('name', v)} placeholder="e.g. John Smith" />
-      </FormRow>
-      <FormRow label="Thai Name">
-        <Input value={form.thaiName ?? ''} onChange={v => up('thaiName', v)} placeholder="ชื่อไทย" />
-      </FormRow>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <FormRow label="Full Name" required>
+          <Input autoFocus value={form.name ?? ''} onChange={v => up('name', v)} placeholder="e.g. John Smith" />
+        </FormRow>
+        <FormRow label="Thai Name">
+          <Input value={form.thaiName ?? ''} onChange={v => up('thaiName', v)} placeholder="ชื่อไทย" />
+        </FormRow>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <FormRow label="Nickname"><Input value={form.nickname ?? ''} onChange={v => up('nickname', v)} placeholder="e.g. John" /></FormRow>
         <FormRow label="Type">
